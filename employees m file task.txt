@@ -1,0 +1,47 @@
+let
+    Source = Excel.Workbook(
+        File.Contents("C:\Users\ELCOT\Downloads\employees.xlsx"),
+        null,
+        true
+    ),
+
+    Employees_Sheet = Source{[Item="employees",Kind="Sheet"]}[Data],
+
+    Promoted_Headers = Table.PromoteHeaders(
+        Employees_Sheet,
+        [PromoteAllScalars=true]
+    ),
+
+    Changed_Type = Table.TransformColumnTypes(
+        Promoted_Headers,
+        {
+            {"emp_id", Int64.Type},
+            {"emp_name", type text},
+            {"dept_id", Int64.Type},
+            {"salary", Int64.Type},
+            {"city", type text}
+        }
+    ),
+
+    Filtered_Salary = Table.SelectRows(
+        Changed_Type,
+        each [salary] > 60000
+    ),
+
+    Added_Annual_Salary = Table.AddColumn(
+        Filtered_Salary,
+        "Annual Salary",
+        each [salary] * 12,
+        Int64.Type
+    ),
+
+    Sorted_Salary = Table.Sort(
+        Added_Annual_Salary,
+        {{"salary", Order.Descending}}
+    )
+
+in
+    Sorted_Salary           
+
+
+                                                                                                                                                                                                                                                                                                   
